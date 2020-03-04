@@ -4,65 +4,58 @@ import (
 	"fmt"
 
 	"github.com/NoSkillGirl/greedy_bidders/auctioneer/constants"
+	"github.com/NoSkillGirl/greedy_bidders/auctioneer/log"
 )
 
+// GetActiveRegisteredBidders - returns a map of bidder_id and domain
 func GetActiveRegisteredBidders() map[string]string {
 	db := constants.Config.GetDatabaseConnection()
+	selectBidderQuery := `SELECT id, domain FROM bidders where online = 1;`
 
-	selectAllUsersQuery := `SELECT id, domain FROM bidders where online = 1;`
+	rows, err := db.Query(selectBidderQuery)
 
-	// perform a db.Query select
-	rows, err := db.Query(selectAllUsersQuery)
-
-	// if there is an error, handle it
 	if err != nil {
-		panic(err.Error())
+		log.Error.Println("Error in selecting the bidders from database", err)
 	}
-
-	defer rows.Close()
 
 	biddersMap := make(map[string]string)
 
 	for rows.Next() {
-
 		var bidderID, bidderDomain string
-
 		err = rows.Scan(&bidderID, &bidderDomain)
-
 		if err != nil {
-			// handle this error
-			panic(err)
+			log.Error.Println("Error in Scaning from the databsae", err)
+		} else {
+			biddersMap[bidderID] = bidderDomain
 		}
-
-		biddersMap[bidderID] = bidderDomain
-
 	}
 
 	// get any error encountered during iteration
 	err = rows.Err()
 	if err != nil {
-		panic(err)
+		log.Error.Println("Error in Scaning from the databsae", err)
 	}
+
+	rows.Close()
 
 	return biddersMap
 }
 
-func RegisterBidder(BidderId string, host string) {
+// RegisterBidder - for storing bidder information in the database
+func RegisterBidder(bidderID string, host string) {
 	db := constants.Config.GetDatabaseConnection()
 
-	addBidderQuery := `INSERT INTO bidders (id, domain, online) VALUES ('%s', '%s', true)`
+	addBidderQuery := `INSERT INTO bidders (id, domain, online) VALUES ('%s', '%s', true) on duplicate key update domain = '%s', online = true;`
 
-	addBidderQueryString := fmt.Sprintf(addBidderQuery, BidderId, host)
+	addBidderQueryString := fmt.Sprintf(addBidderQuery, bidderID, host, host)
 	fmt.Println(addBidderQueryString)
 
-	// perform a db.Query insert
 	insert, err := db.Query(addBidderQueryString)
 
 	// if there is an error inserting, handle it
 	if err != nil {
-		panic(err.Error())
+		log.Error.Println("Failed to insert bidder id in the database", err)
 	}
 
-	// be careful deferring Queries if you are using transactions
-	defer insert.Close()
+	insert.Close()
 }

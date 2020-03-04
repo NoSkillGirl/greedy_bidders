@@ -8,11 +8,14 @@ import (
 )
 
 func init() {
+	// Set Constants
 	constants.SetConstants()
+	// Set Routes
 	routers.BidderRoutes()
 	routers.AuctioneersRoutes()
 }
 
 func main() {
+	// Start http server
 	http.ListenAndServe(":8080", nil)
 }

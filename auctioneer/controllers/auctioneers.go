@@ -9,6 +9,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/NoSkillGirl/greedy_bidders/auctioneer/log"
 	"github.com/NoSkillGirl/greedy_bidders/auctioneer/models"
 )
 
@@ -21,7 +22,7 @@ type NewBiddingRoundResponse struct {
 	Price    float64 `json:"price"`
 }
 
-// NewBiddingRound Request
+// NewBiddingRound - requests all bidders and gets responses within 200ms and declares a winner
 func NewBiddingRound(w http.ResponseWriter, r *http.Request) {
 
 	// Req Obj
@@ -78,8 +79,7 @@ func NewBiddingRound(w http.ResponseWriter, r *http.Request) {
 				// Res Decode
 				err = json.NewDecoder(resp.Body).Decode(&placeBidResponseJSON)
 				if err != nil {
-					// TODO: use logger
-					fmt.Println(err)
+					log.Error.Println(err)
 					json.NewEncoder(w).Encode(resp)
 					return
 				}

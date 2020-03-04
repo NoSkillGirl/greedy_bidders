@@ -23,10 +23,12 @@ type GetActiveRegisteredBiddersResponse struct {
 	BidderIds []string `json:"bidder_ids"`
 }
 
+// HealthCheck - health check endpoint
 func HealthCheck(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode("{}")
 }
 
+// RegisterBidder - endpoint for registering a bidder
 func RegisterBidder(w http.ResponseWriter, r *http.Request) {
 	// Req Obj
 	var reqJSON RegisterBidderRequest
@@ -48,6 +50,7 @@ func RegisterBidder(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(resp)
 }
 
+// GetActiveRegisteredBidders - endpoint for getting the list of active bidders
 func GetActiveRegisteredBidders(w http.ResponseWriter, r *http.Request) {
 
 	// Req Obj
