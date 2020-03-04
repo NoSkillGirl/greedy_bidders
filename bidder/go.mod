@@ -6,5 +6,6 @@ require (
 	github.com/google/uuid v1.1.1
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d // indirect
 	github.com/satori/go.uuid v1.2.0
+	golang.org/x/tools v0.0.0-20200304024140-c4206d458c3f // indirect
 	gopkg.in/yaml.v2 v2.2.8
 )

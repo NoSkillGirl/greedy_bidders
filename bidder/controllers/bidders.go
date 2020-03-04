@@ -40,7 +40,7 @@ func PlaceBid(w http.ResponseWriter, r *http.Request) {
 	r1 := rand.New(s1)
 	price := r1.Float64() * 100
 
-	resp.BidderId = constants.GetBidderId()
+	resp.BidderId = constants.GetBidderID()
 	resp.Price = price
 
 	time.Sleep(time.Duration(config.Delay) * time.Millisecond)

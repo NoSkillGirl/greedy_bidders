@@ -7,6 +7,7 @@ import (
 )
 
 func BidderRoutes() {
+	http.HandleFunc("/", controllers.HealthCheck)
 	http.HandleFunc("/RegisterBidder", controllers.RegisterBidder)
 	http.HandleFunc("/GetActiveRegisteredBidders", controllers.GetActiveRegisteredBidders)
 }

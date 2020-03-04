@@ -39,13 +39,55 @@ func (c *Database) GetDatabaseConnection() (db *sql.DB) {
 	dbUser := c.Database.UserName
 	dbPass := c.Database.Password
 	dbName := c.Database.Name
-	db, err := sql.Open(dbDriver, dbUser+":"+dbPass+"@/"+dbName)
+	dbHost := c.Database.Host
+	dbPort := c.Database.Port
+	db, err := sql.Open(dbDriver, dbUser+":"+dbPass+"@tcp("+dbHost+":"+dbPort+")/"+dbName)
 	if err != nil {
 		panic(err.Error())
 	}
 	return db
 }
 
+func (c *Database) createInitialTables() {
+	db := c.GetDatabaseConnection()
+	_, err := db.Exec(`create table auctions
+	(
+		id               varchar(200) not null,
+		winner_bidder_id varchar(200) null,
+		price            float        null,
+		constraint auction_id_uindex
+			unique (id)
+	);`)
+	if err != nil {
+		// panic(err)
+	}
+
+	_, err = db.Exec(`create table bidders
+	(
+		id     varchar(200) not null,
+		domain varchar(255) null,
+		online tinyint(1)   null,
+		constraint bidder_id_uindex
+			unique (id)
+	);`)
+	if err != nil {
+		// panic(err)
+	}
+
+	_, err = db.Exec(`alter table auctions add primary key (id);`)
+	if err != nil {
+		// panic(err)
+	}
+
+	_, err = db.Exec(`alter table bidders add primary key (id);`)
+	if err != nil {
+		// panic(err)
+	}
+
+}
+
 func SetConstants() {
 	Config.setValuesFromConfig()
+	Config.createInitialTables()
+
 }

@@ -9,11 +9,12 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-func GetBidderId() string {
+// GetBidderID - returns bidderID
+func GetBidderID() string {
 	return BidderID
 }
 
-func setBidderId() {
+func setBidderID() {
 	fmt.Println("Setting Bidder Id")
 	id, err := uuid.NewUUID()
 	if err != nil {
@@ -22,6 +23,7 @@ func setBidderId() {
 	BidderID = id.String()
 }
 
+// Conf - to store config
 type Conf struct {
 	Port                  string `yaml:"port"`
 	Delay                 int64  `yaml:"delay"`
@@ -40,14 +42,19 @@ func (c *Conf) setValuesFromConfig() {
 	}
 }
 
+// GetConf - GetConfig
 func (c *Conf) GetConf() *Conf {
 	return c
 }
 
+// BidderID - For this Bidder
 var BidderID string
+
+// C - Config
 var C Conf
 
+// SetConstants - to be called once before server start
 func SetConstants() {
-	setBidderId()
+	setBidderID()
 	C.setValuesFromConfig()
 }

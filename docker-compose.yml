@@ -1,0 +1,37 @@
+version: "3.7"
+services:
+  db:
+    image: "mysql:5.7.29"
+    environment:
+      # MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: "greedy_bidder"
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_USER: pooja
+      MYSQL_PASSWORD: oreo
+    networks:
+      - backend
+  auctioneer:
+    build: "auctioneer/"
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      interval: 3s
+      timeout: 1s
+      retries: 5
+    depends_on:
+      - db
+    networks:
+      - backend
+    restart: on-failure
+  bidder1:
+    # build .
+    build: "bidder/"
+    depends_on:
+      - auctioneer
+      - db
+    restart: on-failure
+    networks:
+      - backend
+networks:
+  backend:

@@ -50,6 +50,9 @@ func GetActiveRegisteredBidders() map[string]string {
 func RegisterBidder(BidderId string, host string) {
 	db := constants.Config.GetDatabaseConnection()
 
+	fmt.Println("--------RegisterBidder----")
+	fmt.Println(db)
+
 	addBidderQuery := `INSERT INTO bidders (id, domain, online) VALUES ('%s', '%s', true)`
 
 	addBidderQueryString := fmt.Sprintf(addBidderQuery, BidderId, host)

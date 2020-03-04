@@ -9,7 +9,7 @@ import (
 )
 
 type RegisterBidderRequest struct {
-	BidderId string `json:"bidder_id"`
+	BidderID string `json:"bidder_id"`
 	Host     string `json:"host"`
 }
 
@@ -23,7 +23,14 @@ type GetActiveRegisteredBiddersResponse struct {
 	BidderIds []string `json:"bidder_ids"`
 }
 
+func HealthCheck(w http.ResponseWriter, r *http.Request) {
+	json.NewEncoder(w).Encode("{}")
+}
+
 func RegisterBidder(w http.ResponseWriter, r *http.Request) {
+
+	fmt.Println("------------------")
+	fmt.Println("Someone came here with req", r)
 	// Req Obj
 	var reqJSON RegisterBidderRequest
 
@@ -39,9 +46,10 @@ func RegisterBidder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	fmt.Println("----------------")
 	fmt.Println(r)
 
-	models.RegisterBidder(reqJSON.BidderId, reqJSON.Host)
+	models.RegisterBidder(reqJSON.BidderID, reqJSON.Host)
 
 	json.NewEncoder(w).Encode(resp)
 }

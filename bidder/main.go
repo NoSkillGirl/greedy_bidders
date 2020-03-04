@@ -21,15 +21,15 @@ func main() {
 
 func informAuctioneerAboutYou(auctioneerURL string) {
 	type RegisterBidderRequest struct {
-		BidderId string `json:"bidder_id"`
+		BidderID string `json:"bidder_id"`
 		Host     string `json:"host"`
 	}
 
-	bidderID := constants.GetBidderId()
+	bidderID := constants.GetBidderID()
 	host := "http://localhost:" + constants.C.Port
 
 	thisRequest := RegisterBidderRequest{
-		BidderId: bidderID,
+		BidderID: bidderID,
 		Host:     host,
 	}
 
@@ -42,11 +42,13 @@ func informAuctioneerAboutYou(auctioneerURL string) {
 	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Println(err)
-	}
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		fmt.Println("Error in reading response body from smsService", err)
+	} else {
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			fmt.Println("Error in reading response body from smsService", err)
+		}
+
+		fmt.Println(string(body))
 	}
 
-	fmt.Println(string(body))
 }

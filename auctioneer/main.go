@@ -7,10 +7,12 @@ import (
 	"github.com/NoSkillGirl/greedy_bidders/auctioneer/routers"
 )
 
-func main() {
-	// routers.AuctioneersRoutes()
+func init() {
 	constants.SetConstants()
 	routers.BidderRoutes()
 	routers.AuctioneersRoutes()
+}
+
+func main() {
 	http.ListenAndServe(":8080", nil)
 }

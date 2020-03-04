@@ -1,10 +1,6 @@
 package controllers
 
 import (
-	// "bytes"
-	// "encoding/json"
-	// "fmt"
-	// "io/ioutil"
 	"bytes"
 	"encoding/json"
 	"fmt"
