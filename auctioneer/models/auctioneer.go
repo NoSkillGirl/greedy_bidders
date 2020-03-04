@@ -1,20 +1,27 @@
 package models
 
-const mySQLHost = "127.0.0.1:3306"
+import (
+	"fmt"
 
-var mySQLConnection = fmt.Sprintf("root:@tcp(%s)/greedy_bidder", mySQLHost)
+	"github.com/NoSkillGirl/greedy_bidders/auctioneer/constants"
+)
 
-// NewBiddingRound - Creates a new bidding round
-func NewBiddingRound(auctionID string) error {
-	db, err := sql.Open("mysql", mySQLConnection)
+func DeclareWinner(auctionID string, bidderID string, price float64) {
+	db := constants.Config.GetDatabaseConnection()
+
+	addAuctionQuery := `insert into auctions (id, winner_bidder_id, price) VALUES ('%s', '%s', %f)`
+
+	addAuctionQueryString := fmt.Sprintf(addAuctionQuery, auctionID, bidderID, price)
+	fmt.Println(addAuctionQueryString)
+
+	// perform a db.Query insert
+	insert, err := db.Query(addAuctionQueryString)
+
+	// if there is an error inserting, handle it
 	if err != nil {
 		panic(err.Error())
 	}
 
-	defer db.Close()
-	return nil
+	// be careful deferring Queries if you are using transactions
+	defer insert.Close()
 }
-
-// connect to mysql
-// create a table auctions
-// row create

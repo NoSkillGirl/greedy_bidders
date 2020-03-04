@@ -9,5 +9,4 @@ import (
 // AuctioneersRoutes - All Auctioneer Related Routes
 func AuctioneersRoutes() {
 	http.HandleFunc("/NewAuction", controllers.NewBiddingRound)
-	http.HandleFunc("/ListRegisteredBidders", controllers.ListRegisteredBidders)
 }
