@@ -1,9 +1,22 @@
-# greedy_bidders
+# Greedy Bidders
 
 This repo represents an auction system which can auction bids and select the winning bid such that it always responds before a specific time interval.
 
+## Prerequisites
+
+- Docker, Docker Compose
+- Golang
+
+## Getting Up and Running
+
+- `git clone https://github.com/NoSkillGirl/greedy_bidders.git`
+- `cd greedy_bidders`
+- `docker-compose rm -f && docker-compose up --remove-orphans --build`
+
+## API Documentation
 
 This repo is having 4 public endpoints:
+
 1. New Auction
 2. RegisterBidder
 3. GetActiveRegisteredBidders
@@ -23,6 +36,7 @@ Example:
 	"auction_id": "PEN656"
 }
 ```
+
 #### Response
 
 - Type: JSON
@@ -59,6 +73,7 @@ Example:
 	"host": "http://localhost:8090"
 }
 ```
+
 #### Response
 
 - Type: JSON
@@ -80,6 +95,7 @@ Example:
 ```JSON
 {}
 ```
+
 #### Response
 
 - Type: JSON
@@ -121,6 +137,7 @@ Example:
 	"auction_id": "test"
 }
 ```
+
 #### Response
 
 - Type: JSON
@@ -141,4 +158,3 @@ Example:
 	"price": 75.65
 }
 ```
-
