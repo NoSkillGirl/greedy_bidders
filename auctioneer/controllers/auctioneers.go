@@ -17,9 +17,8 @@ type NewBiddingRoundRequest struct {
 }
 
 type NewBiddingRoundResponse struct {
-	BidderID string `json:"bidder_id"`
-	// TODO: check if float64 is needed?
-	Price float64 `json:"price"`
+	BidderID string  `json:"bidder_id"`
+	Price    float64 `json:"price"`
 }
 
 // NewBiddingRound Request
@@ -35,7 +34,6 @@ func NewBiddingRound(w http.ResponseWriter, r *http.Request) {
 	// Req Decode
 	err := json.NewDecoder(r.Body).Decode(&reqJSON)
 	if err != nil {
-		// TODO: use logger
 		fmt.Println(err)
 		json.NewEncoder(w).Encode(resp)
 		return
