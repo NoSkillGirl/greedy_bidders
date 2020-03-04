@@ -20,7 +20,7 @@ Example:
 
 ```JSON
 {
-	"auction_id": “PEN656”
+	"auction_id": "PEN656"
 }
 ```
 #### Response
@@ -31,7 +31,7 @@ Example:
 ```JSON
 {
 	"bidder_id": "id of the bidder",
-	"price": bid bidded by the bidder
+	"price": "bid bidded by the bidder"
 }
 ```
 
@@ -118,7 +118,7 @@ Example:
 
 ```JSON
 {
-	"auction_id": “test”
+	"auction_id": "test"
 }
 ```
 #### Response
@@ -129,7 +129,7 @@ Example:
 ```JSON
 {
 	"bidder_id": "id of the bidder",
-	"price": bid bidded by the bidder
+	"price": "bid bidded by the bidder"
 }
 ```
 
