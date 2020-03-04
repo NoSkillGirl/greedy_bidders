@@ -2,11 +2,14 @@ package constants
 
 import (
 	"fmt"
-	"io/ioutil"
-	"log"
+	"strconv"
+
+	// "io/ioutil"
+	// "log"
+	"os"
 
 	"github.com/google/uuid"
-	"gopkg.in/yaml.v2"
+	// "gopkg.in/yaml.v2"
 )
 
 // GetBidderID - returns bidderID
@@ -15,7 +18,6 @@ func GetBidderID() string {
 }
 
 func setBidderID() {
-	fmt.Println("Setting Bidder Id")
 	id, err := uuid.NewUUID()
 	if err != nil {
 		fmt.Println("UUID Generation Error")
@@ -26,20 +28,27 @@ func setBidderID() {
 // Conf - to store config
 type Conf struct {
 	Port                  string `yaml:"port"`
-	Delay                 int64  `yaml:"delay"`
+	Delay                 int    `yaml:"delay"`
 	AuctioneerRegisterURL string `yaml:"auctioneer_register_url"`
+	Host                  string `yaml:"host"`
 }
 
 func (c *Conf) setValuesFromConfig() {
+	// yamlFile, err := ioutil.ReadFile("config.yaml")
+	// if err != nil {
+	// 	log.Printf("yamlFile.Get err   #%v ", err)
+	// }
+	// err = yaml.Unmarshal(yamlFile, c)
+	// if err != nil {
+	// 	log.Fatalf("Unmarshal: %v", err)
+	// }
+	// auctioneer_register_url
+	c.AuctioneerRegisterURL = "http://" + os.Getenv("AUCTIONEER_URL") + "/RegisterBidder"
+	c.Port = os.Getenv("PORT")
 
-	yamlFile, err := ioutil.ReadFile("config.yaml")
-	if err != nil {
-		log.Printf("yamlFile.Get err   #%v ", err)
-	}
-	err = yaml.Unmarshal(yamlFile, c)
-	if err != nil {
-		log.Fatalf("Unmarshal: %v", err)
-	}
+	i, _ := strconv.Atoi(os.Getenv("DELAY"))
+	c.Delay = i
+	c.Host = os.Getenv("HOST")
 }
 
 // GetConf - GetConfig

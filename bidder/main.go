@@ -26,7 +26,7 @@ func informAuctioneerAboutYou(auctioneerURL string) {
 	}
 
 	bidderID := constants.GetBidderID()
-	host := "http://localhost:" + constants.C.Port
+	host := "http://" + constants.C.Host + ":" + constants.C.Port
 
 	thisRequest := RegisterBidderRequest{
 		BidderID: bidderID,

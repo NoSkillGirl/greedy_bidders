@@ -41,9 +41,6 @@ func NewBiddingRound(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println("-------------")
-	fmt.Println(reqJSON)
-
 	biddersMap := models.GetActiveRegisteredBidders()
 
 	type PlaceBidRequest struct {
@@ -55,13 +52,12 @@ func NewBiddingRound(w http.ResponseWriter, r *http.Request) {
 		Price    float64 `json:"price"`
 	}
 
-	winnerBidderID := ""
-	var winnderBidderPrice float64 = 0
+	BiddersMap := make(map[string]float64)
 
 	var wg sync.WaitGroup
 	for _, value := range biddersMap {
 
-		go func(wg *sync.WaitGroup) {
+		go func(v string, wg *sync.WaitGroup) {
 
 			thisRequest := PlaceBidRequest{
 				AuctionID: reqJSON.AuctionID,
@@ -69,7 +65,7 @@ func NewBiddingRound(w http.ResponseWriter, r *http.Request) {
 
 			thisRequestInBytes, err := json.Marshal(thisRequest)
 
-			req, err := http.NewRequest("POST", value, bytes.NewBuffer(thisRequestInBytes))
+			req, err := http.NewRequest("POST", v, bytes.NewBuffer(thisRequestInBytes))
 			req.Header.Set("Content-Type", "application/json")
 
 			client := &http.Client{
@@ -90,19 +86,26 @@ func NewBiddingRound(w http.ResponseWriter, r *http.Request) {
 					return
 				}
 
-				if placeBidResponseJSON.Price > winnderBidderPrice {
-					winnderBidderPrice = placeBidResponseJSON.Price
-					winnerBidderID = placeBidResponseJSON.BidderId
-				}
+				BiddersMap[placeBidResponseJSON.BidderId] = placeBidResponseJSON.Price
 			}
 			wg.Done()
-		}(&wg)
+		}(value, &wg)
 
 		wg.Add(1)
 
 	}
 
 	wg.Wait()
+
+	winnerBidderID := ""
+	var winnderBidderPrice float64 = 0
+
+	for k, v := range BiddersMap {
+		if v > winnderBidderPrice {
+			winnderBidderPrice = v
+			winnerBidderID = k
+		}
+	}
 
 	resp.BidderID = winnerBidderID
 	resp.Price = math.Round(winnderBidderPrice*100) / 100

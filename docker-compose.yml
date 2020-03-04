@@ -10,8 +10,14 @@ services:
       MYSQL_PASSWORD: oreo
     networks:
       - backend
+    healthcheck:
+      test: mysqladmin -upooja -poreo ping
+      interval: 2s
+      timeout: 5s
+      retries: 30
   auctioneer:
     build: "auctioneer/"
+    command: dockerize -wait tcp://db:3306 -timeout 20s ./service
     ports:
       - "8080:8080"
     healthcheck:
@@ -26,12 +32,93 @@ services:
     restart: on-failure
   bidder1:
     # build .
-    build: "bidder/"
+    build: bidder/
+    command: dockerize -wait tcp://db:3306 -wait http://auctioneer:8080 -timeout 20s ./service
     depends_on:
       - auctioneer
       - db
     restart: on-failure
     networks:
       - backend
+    environment:
+      AUCTIONEER_URL: auctioneer:8080
+      PORT: 8081
+      DELAY: 150
+      HOST: bidder1
+  bidder2:
+    # build .
+    build: "bidder/"
+    command: dockerize -wait tcp://db:3306 -wait http://auctioneer:8080 -timeout 20s ./service
+    depends_on:
+      - auctioneer
+      - db
+    restart: on-failure
+    networks:
+      - backend
+    environment:
+      AUCTIONEER_URL: "auctioneer:8080"
+      PORT: "8082"
+      DELAY: 200
+      HOST: "bidder2"
+  bidder3:
+    # build .
+    build: "bidder/"
+    command: dockerize -wait tcp://db:3306 -wait http://auctioneer:8080 -timeout 20s ./service
+    depends_on:
+      - auctioneer
+      - db
+    restart: on-failure
+    networks:
+      - backend
+    environment:
+      AUCTIONEER_URL: "auctioneer:8080"
+      PORT: "8083"
+      DELAY: 50
+      HOST: "bidder3"
+  bidder4:
+    # build .
+    build: "bidder/"
+    command: dockerize -wait tcp://db:3306 -wait http://auctioneer:8080 -timeout 20s ./service
+    depends_on:
+      - auctioneer
+      - db
+    restart: on-failure
+    networks:
+      - backend
+    environment:
+      AUCTIONEER_URL: "auctioneer:8080"
+      PORT: "8084"
+      DELAY: 10
+      HOST: "bidder4"
+  bidder5:
+    # build .
+    build: "bidder/"
+    command: dockerize -wait tcp://db:3306 -wait http://auctioneer:8080 -timeout 20s ./service
+    depends_on:
+      - auctioneer
+      - db
+    restart: on-failure
+    networks:
+      - backend
+    environment:
+      AUCTIONEER_URL: "auctioneer:8080"
+      PORT: "8085"
+      DELAY: 300
+      HOST: "bidder5"
+  bidder6:
+    # build .
+    build: bidder/
+    command: dockerize -wait tcp://db:3306 -wait http://auctioneer:8080 -timeout 20s ./service
+    depends_on:
+      - auctioneer
+      - db
+    restart: on-failure
+    networks:
+      - backend
+    environment:
+      AUCTIONEER_URL: auctioneer:8080
+      PORT: "8086"
+      DELAY: 500
+      HOST: bidder6
 networks:
   backend:

@@ -28,9 +28,6 @@ func HealthCheck(w http.ResponseWriter, r *http.Request) {
 }
 
 func RegisterBidder(w http.ResponseWriter, r *http.Request) {
-
-	fmt.Println("------------------")
-	fmt.Println("Someone came here with req", r)
 	// Req Obj
 	var reqJSON RegisterBidderRequest
 
@@ -45,9 +42,6 @@ func RegisterBidder(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(resp)
 		return
 	}
-
-	fmt.Println("----------------")
-	fmt.Println(r)
 
 	models.RegisterBidder(reqJSON.BidderID, reqJSON.Host)
 
