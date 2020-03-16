@@ -1,3 +1,0 @@
-port: 8081
-auctioneer_register_url: "http://auctioneer:8080/RegisterBidder"
-delay: 10

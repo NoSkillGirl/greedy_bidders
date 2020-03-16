@@ -4,7 +4,7 @@ services:
     image: "mysql:5.7.29"
     environment:
       # MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
-      MYSQL_DATABASE: "greedy_bidder"
+      MYSQL_DATABASE: greedy_bidder
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_USER: pooja
       MYSQL_PASSWORD: oreo
@@ -18,6 +18,11 @@ services:
   auctioneer:
     build: "auctioneer/"
     command: dockerize -wait tcp://db:3306 -timeout 20s ./service
+    environment:
+      DB_HOST: db
+      DB_USER: pooja
+      DB_PASS: oreo
+      DB_NAME: greedy_bidder
     ports:
       - "8080:8080"
     healthcheck:

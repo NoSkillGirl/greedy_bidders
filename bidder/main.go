@@ -9,13 +9,19 @@ import (
 
 	"github.com/NoSkillGirl/greedy_bidders/bidder/constants"
 	"github.com/NoSkillGirl/greedy_bidders/bidder/routers"
+
+	_ "net/http/pprof"
+
+	"github.com/pkg/profile"
 )
 
 func main() {
+	defer profile.Start(profile.CPUProfile, profile.ProfilePath("."), profile.NoShutdownHook).Stop()
 	constants.SetConstants()
-	config := constants.C.GetConf()
+	config := constants.Config.GetConf()
 	routers.BidderRoutes()
 	informAuctioneerAboutYou(config.AuctioneerRegisterURL)
+
 	http.ListenAndServe(":"+config.Port, nil)
 }
 
@@ -26,7 +32,7 @@ func informAuctioneerAboutYou(auctioneerURL string) {
 	}
 
 	bidderID := constants.GetBidderID()
-	host := "http://" + constants.C.Host + ":" + constants.C.Port
+	host := "http://" + constants.Config.Host + ":" + constants.Config.Port
 
 	thisRequest := RegisterBidderRequest{
 		BidderID: bidderID,

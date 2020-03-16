@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"time"
 
+	_ "net/http/pprof"
+
 	"github.com/NoSkillGirl/greedy_bidders/bidder/constants"
 )
 
@@ -20,9 +22,10 @@ type PlaceBidResponse struct {
 }
 
 func PlaceBid(w http.ResponseWriter, r *http.Request) {
+
 	// Req Obj
 	var reqJSON PlaceBidRequest
-	config := constants.C.GetConf()
+	config := constants.Config.GetConf()
 
 	// Res Obj
 	resp := PlaceBidResponse{}
@@ -32,6 +35,16 @@ func PlaceBid(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&reqJSON)
 	if err != nil {
 		fmt.Println(err)
+		json.NewEncoder(w).Encode(resp)
+		return
+	}
+
+	// fmt.Printf(`req received with auction id: %s`, reqJSON.AuctionID)
+
+	// validations
+	if reqJSON.AuctionID == "" {
+		fmt.Println("Auction ID is not present in the req")
+		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(resp)
 		return
 	}

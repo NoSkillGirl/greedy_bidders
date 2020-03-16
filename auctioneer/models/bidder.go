@@ -1,6 +1,7 @@
 package models
 
 import (
+	"database/sql"
 	"fmt"
 
 	"github.com/NoSkillGirl/greedy_bidders/auctioneer/constants"
@@ -8,8 +9,10 @@ import (
 )
 
 // GetActiveRegisteredBidders - returns a map of bidder_id and domain
-func GetActiveRegisteredBidders() map[string]string {
-	db := constants.Config.GetDatabaseConnection()
+func GetActiveRegisteredBidders(db *sql.DB) map[string]string {
+	if db == nil {
+		db = constants.DbConfig.GetDatabaseConnection()
+	}
 	selectBidderQuery := `SELECT id, domain FROM bidders where online = 1;`
 
 	rows, err := db.Query(selectBidderQuery)
@@ -42,8 +45,10 @@ func GetActiveRegisteredBidders() map[string]string {
 }
 
 // RegisterBidder - for storing bidder information in the database
-func RegisterBidder(bidderID string, host string) {
-	db := constants.Config.GetDatabaseConnection()
+func RegisterBidder(db *sql.DB, bidderID string, host string) {
+	if db == nil {
+		db = constants.DbConfig.GetDatabaseConnection()
+	}
 
 	addBidderQuery := `INSERT INTO bidders (id, domain, online) VALUES ('%s', '%s', true) on duplicate key update domain = '%s', online = true;`
 

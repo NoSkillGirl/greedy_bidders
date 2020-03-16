@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"regexp"
 
 	"github.com/NoSkillGirl/greedy_bidders/auctioneer/models"
 )
@@ -45,7 +46,22 @@ func RegisterBidder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	models.RegisterBidder(reqJSON.BidderID, reqJSON.Host)
+	if reqJSON.BidderID == "" || reqJSON.Host == "" {
+		fmt.Println("Bidder ID or/and host is not present in the req")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(resp)
+		return
+	}
+
+	validUUID := validUUID(reqJSON.BidderID)
+	if validUUID == false {
+		fmt.Println("Bidder ID present in req is not valid")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(resp)
+		return
+	}
+
+	models.RegisterBidder(nil, reqJSON.BidderID, reqJSON.Host)
 
 	json.NewEncoder(w).Encode(resp)
 }
@@ -78,4 +94,12 @@ func GetActiveRegisteredBidders(w http.ResponseWriter, r *http.Request) {
 	resp.BidderIds = bidderIds
 
 	json.NewEncoder(w).Encode(resp)
+}
+
+func validUUID(uuid string) bool {
+	if len(uuid) != 36 {
+		return false
+	}
+	r := regexp.MustCompile("^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}$")
+	return r.MatchString(uuid)
 }

@@ -3,63 +3,67 @@ package constants
 import (
 	"database/sql"
 	"fmt"
-	"io/ioutil"
 	"os"
 
 	"github.com/NoSkillGirl/greedy_bidders/auctioneer/log"
 	_ "github.com/go-sql-driver/mysql"
-	"gopkg.in/yaml.v2"
 )
 
-// Database - database config
+// Database - for reading database config
 type Database struct {
-	Database DatabaseConf `yaml:database`
+	UserName string
+	Password string
+	Port     string
+	Name     string
+	Host     string
 }
 
-// DatabaseConf - for reading database config
-type DatabaseConf struct {
-	UserName string `yaml:user_name`
-	Password string `yaml:password`
-	Port     string `yaml:"port"`
-	Name     string `yaml:name`
-	Host     string `yaml:host`
-}
+// DbConfig - available through out the application
+var DbConfig Database
 
-// Config - available through out the application
-var Config Database
+func (db *Database) setValuesFromConfig() {
+	dbHost := os.Getenv("DB_HOST")
+	dbPort := os.Getenv("DB_PORT")
+	dbUser := os.Getenv("DB_USER")
+	dbPass := os.Getenv("DB_PASS")
+	dbName := os.Getenv("DB_NAME")
 
-func (c *Database) setValuesFromConfig() {
-	yamlFile, err := ioutil.ReadFile("config.yaml")
-	if err != nil {
-		fmt.Printf("yamlFile.Get err   #%v ", err)
-		panic(err)
+	if dbHost == "" || dbPort == "" || dbUser == "" || dbName == "" {
+		fmt.Println(`Make sure all these environment variables are set. 
+		1. DB_HOST
+		2. DB_PORT
+		3. DB_USER
+		4. DB_PASS
+		5. DB_NAME
+
+		`)
+
+		fmt.Println("Example: DB_HOST=localhost DB_PORT=3306 DB_USER=pooja DB_PASS=oreo DB_NAME=greedy_bidder go run main.go")
+		panic("ENV not set")
 	}
-	err = yaml.Unmarshal(yamlFile, c)
-	if err != nil {
-		fmt.Printf("Unmarshal: %v", err)
-		panic(err)
-	}
+
+	db.Host = dbHost
+	db.Port = dbPort
+	db.UserName = dbUser
+	db.Password = dbPass
+	db.Name = dbName
 }
 
 // GetDatabaseConnection - for getting database connection
-func (c *Database) GetDatabaseConnection() (db *sql.DB) {
+func (db *Database) GetDatabaseConnection() (con *sql.DB) {
 	dbDriver := "mysql"
-	dbUser := c.Database.UserName
-	dbPass := c.Database.Password
-	dbName := c.Database.Name
-	dbHost := c.Database.Host
-	dbPort := c.Database.Port
-	db, err := sql.Open(dbDriver, dbUser+":"+dbPass+"@tcp("+dbHost+":"+dbPort+")/"+dbName)
+	con, err := sql.Open(dbDriver, db.UserName+":"+db.Password+"@tcp("+db.Host+":"+db.Port+")/"+db.Name)
 	if err != nil {
+		log.Error.Println("error in opening db connection")
 		panic(err.Error())
 	}
-	return db
+	return con
 }
 
 // One time migrations needed for bootstraping database, will be skipped from the second time.
-func (c *Database) migrations() {
-	db := c.GetDatabaseConnection()
-	_, err := db.Exec(`create table if not exists auctions
+func (db *Database) migrations() {
+	dbCon := db.GetDatabaseConnection()
+	_, err := dbCon.Exec(`create table if not exists auctions
 	(
 		id               varchar(200) not null,
 		winner_bidder_id varchar(200) null,
@@ -72,7 +76,7 @@ func (c *Database) migrations() {
 		panic(err)
 	}
 
-	_, err = db.Exec(`create table if not exists bidders
+	_, err = dbCon.Exec(`create table if not exists bidders
 	(
 		id     varchar(200) not null,
 		domain varchar(255) null,
@@ -91,7 +95,7 @@ func SetConstants() {
 	// Setting up Logger
 	log.SetupLogger(os.Stdout, os.Stdout, os.Stdout, os.Stderr)
 	// Read values from config
-	Config.setValuesFromConfig()
+	DbConfig.setValuesFromConfig()
 	// Run Migrations
-	Config.migrations()
+	DbConfig.migrations()
 }
