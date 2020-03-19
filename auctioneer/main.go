@@ -11,6 +11,7 @@ import (
 func init() {
 	// Set Constants
 	constants.SetConstants()
+
 	// Set Routes
 	routers.BidderRoutes()
 	routers.AuctioneersRoutes()
@@ -18,6 +19,12 @@ func init() {
 }
 
 func main() {
+
+	// contextLogger := log.WithFields(log.Fields{
+	// 	"common": "this is a common field",
+	// 	"other":  "I also should be logged always",
+	// })
+
 	// Start http server on port 8080
 	http.ListenAndServe(":8080", nil)
 }

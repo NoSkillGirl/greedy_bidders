@@ -61,7 +61,12 @@ func RegisterBidder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	models.RegisterBidder(nil, reqJSON.BidderID, reqJSON.Host)
+	err = models.RegisterBidder(nil, reqJSON.BidderID, reqJSON.Host)
+	if err != nil {
+		fmt.Println(err)
+		json.NewEncoder(w).Encode(resp)
+		return
+	}
 
 	json.NewEncoder(w).Encode(resp)
 }
@@ -84,7 +89,13 @@ func GetActiveRegisteredBidders(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	biddersMap := models.GetActiveRegisteredBidders()
+	biddersMap, err := models.GetActiveRegisteredBidders(nil)
+
+	if err != nil {
+		fmt.Println(err)
+		json.NewEncoder(w).Encode(resp)
+		return
+	}
 
 	bidderIds := make([]string, 0)
 	for key, _ := range biddersMap {

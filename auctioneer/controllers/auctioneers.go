@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/NoSkillGirl/greedy_bidders/auctioneer/log"
+	logger "github.com/NoSkillGirl/greedy_bidders/auctioneer/log"
 	"github.com/NoSkillGirl/greedy_bidders/auctioneer/models"
 )
 
@@ -42,16 +42,22 @@ func NewBiddingRound(w http.ResponseWriter, r *http.Request) {
 
 	// validations
 	if reqJSON.AuctionID == "" {
-		log.Error.Println("Auction ID is not present in the req")
+		logger.Log.Error("Auction ID is not present in the req")
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(resp)
 		return
 	}
 
-	biddersMap := models.GetActiveRegisteredBidders(nil)
+	biddersMap, err := models.GetActiveRegisteredBidders(nil)
+
+	if err != nil {
+		logger.Log.Error(err)
+		json.NewEncoder(w).Encode(resp)
+		return
+	}
 
 	if len(biddersMap) == 0 {
-		log.Info.Println("Non of the bidders are online")
+		logger.Log.Info("Non of the bidders are online")
 		json.NewEncoder(w).Encode(resp)
 		return
 	}
@@ -93,7 +99,7 @@ func NewBiddingRound(w http.ResponseWriter, r *http.Request) {
 				// Res Decode
 				err = json.NewDecoder(resp.Body).Decode(&placeBidResponseJSON)
 				if err != nil {
-					log.Error.Println(err)
+					logger.Log.Error(err)
 					json.NewEncoder(w).Encode(resp)
 					return
 				}
@@ -122,7 +128,12 @@ func NewBiddingRound(w http.ResponseWriter, r *http.Request) {
 	resp.BidderID = winnerBidderID
 	resp.Price = math.Round(winnderBidderPrice*100) / 100
 
-	models.DeclareWinner(nil, reqJSON.AuctionID, resp.BidderID, resp.Price)
+	err = models.DeclareWinner(nil, reqJSON.AuctionID, resp.BidderID, resp.Price)
+	if err != nil {
+		logger.Log.Error(err)
+		json.NewEncoder(w).Encode(resp)
+		return
+	}
 
 	json.NewEncoder(w).Encode(resp)
 }

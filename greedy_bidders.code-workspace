@@ -1,0 +1,14 @@
+{
+  "folders": [
+    {
+      "path": "auctioneer"
+    },
+    {
+      "path": "bidder"
+    },
+    {
+      "path": "log"
+    }
+  ],
+  "settings": {}
+}

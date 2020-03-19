@@ -2,10 +2,9 @@ package constants
 
 import (
 	"database/sql"
-	"fmt"
 	"os"
 
-	"github.com/NoSkillGirl/greedy_bidders/auctioneer/log"
+	logger "github.com/NoSkillGirl/greedy_bidders/auctioneer/log"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -29,7 +28,7 @@ func (db *Database) setValuesFromConfig() {
 	dbName := os.Getenv("DB_NAME")
 
 	if dbHost == "" || dbPort == "" || dbUser == "" || dbName == "" {
-		fmt.Println(`Make sure all these environment variables are set. 
+		logger.Log.Debug(`Make sure all these environment variables are set. 
 		1. DB_HOST
 		2. DB_PORT
 		3. DB_USER
@@ -38,8 +37,8 @@ func (db *Database) setValuesFromConfig() {
 
 		`)
 
-		fmt.Println("Example: DB_HOST=localhost DB_PORT=3306 DB_USER=pooja DB_PASS=oreo DB_NAME=greedy_bidder go run main.go")
-		panic("ENV not set")
+		logger.Log.Error("Example: DB_HOST=localhost DB_PORT=3306 DB_USER=pooja DB_PASS=oreo DB_NAME=greedy_bidder go run main.go")
+		panic("Environment variables not set")
 	}
 
 	db.Host = dbHost
@@ -54,7 +53,7 @@ func (db *Database) GetDatabaseConnection() (con *sql.DB) {
 	dbDriver := "mysql"
 	con, err := sql.Open(dbDriver, db.UserName+":"+db.Password+"@tcp("+db.Host+":"+db.Port+")/"+db.Name)
 	if err != nil {
-		log.Error.Println("error in opening db connection")
+		logger.Log.Error("error in opening db connection")
 		panic(err.Error())
 	}
 	return con
@@ -72,7 +71,7 @@ func (db *Database) migrations() {
 		constraint auctions_pk PRIMARY KEY (id)
 	);`)
 	if err != nil {
-		log.Error.Println("Unable to create auctions table")
+		logger.Log.Error("Unable to create auctions table")
 		panic(err)
 	}
 
@@ -85,15 +84,17 @@ func (db *Database) migrations() {
 		constraint bidder_pk primary key (id)
 	);`)
 	if err != nil {
-		log.Error.Println("Unable to create bidders table")
+		logger.Log.Error("Unable to create bidders table")
 		panic(err)
 	}
 }
 
+// var Log *logus.Entry
+
 // SetConstants - this method is exposed for the main package to setup
 func SetConstants() {
 	// Setting up Logger
-	log.SetupLogger(os.Stdout, os.Stdout, os.Stdout, os.Stderr)
+	// logger.log.SetupLogger()
 	// Read values from config
 	DbConfig.setValuesFromConfig()
 	// Run Migrations

@@ -5,29 +5,30 @@ import (
 	"fmt"
 
 	"github.com/NoSkillGirl/greedy_bidders/auctioneer/constants"
-	"github.com/NoSkillGirl/greedy_bidders/auctioneer/log"
+	logger "github.com/NoSkillGirl/greedy_bidders/log"
 )
 
 // GetActiveRegisteredBidders - returns a map of bidder_id and domain
-func GetActiveRegisteredBidders(db *sql.DB) map[string]string {
+func GetActiveRegisteredBidders(db *sql.DB) (map[string]string, error) {
+	biddersMap := make(map[string]string)
 	if db == nil {
+		fmt.Println("Coming inside")
 		db = constants.DbConfig.GetDatabaseConnection()
 	}
-	selectBidderQuery := `SELECT id, domain FROM bidders where online = 1;`
 
-	rows, err := db.Query(selectBidderQuery)
+	rows, err := db.Query("SELECT id, domain FROM bidders where online = 1")
 
 	if err != nil {
-		log.Error.Println("Error in selecting the bidders from database", err)
+		fmt.Println(err)
+		logger.Log.Error("Error in selecting the bidders from database", err)
+		return biddersMap, err
 	}
-
-	biddersMap := make(map[string]string)
 
 	for rows.Next() {
 		var bidderID, bidderDomain string
 		err = rows.Scan(&bidderID, &bidderDomain)
 		if err != nil {
-			log.Error.Println("Error in Scaning from the databsae", err)
+			logger.Log.Error("Error in Scaning from the databsae", err)
 		} else {
 			biddersMap[bidderID] = bidderDomain
 		}
@@ -36,31 +37,31 @@ func GetActiveRegisteredBidders(db *sql.DB) map[string]string {
 	// get any error encountered during iteration
 	err = rows.Err()
 	if err != nil {
-		log.Error.Println("Error in Scaning from the databsae", err)
+		logger.Log.Error("Error in Scaning from the databsae", err)
 	}
 
 	rows.Close()
 
-	return biddersMap
+	return biddersMap, err
 }
 
 // RegisterBidder - for storing bidder information in the database
-func RegisterBidder(db *sql.DB, bidderID string, host string) {
+func RegisterBidder(db *sql.DB, bidderID string, host string) error {
 	if db == nil {
 		db = constants.DbConfig.GetDatabaseConnection()
 	}
 
-	addBidderQuery := `INSERT INTO bidders (id, domain, online) VALUES ('%s', '%s', true) on duplicate key update domain = '%s', online = true;`
-
-	addBidderQueryString := fmt.Sprintf(addBidderQuery, bidderID, host, host)
-	fmt.Println(addBidderQueryString)
-
-	insert, err := db.Query(addBidderQueryString)
+	insert, err := db.Query(
+		`INSERT INTO bidders (id, domain, online) VALUES ('$1', '$2', true) on duplicate key update domain = '$3', online = true;`,
+		bidderID, host, host,
+	)
 
 	// if there is an error inserting, handle it
 	if err != nil {
-		log.Error.Println("Failed to insert bidder id in the database", err)
+		logger.Log.Errorf(`Failed to insert bidder id in the database %v`, err)
+		return err
 	}
 
 	insert.Close()
+	return nil
 }
