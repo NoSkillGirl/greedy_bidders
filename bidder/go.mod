@@ -3,6 +3,7 @@ module github.com/NoSkillGirl/greedy_bidders/bidder
 go 1.14
 
 require (
+	github.com/NoSkillGirl/greedy_bidders/log v0.0.0-20200319074911-6a11378244e4
 	github.com/google/pprof v0.0.0-20200229191704-1ebb73c60ed3 // indirect
 	github.com/google/uuid v1.1.1
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d // indirect

@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"os"
 
-	logger "github.com/NoSkillGirl/greedy_bidders/auctioneer/log"
+	logger "github.com/NoSkillGirl/greedy_bidders/log"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -28,7 +28,7 @@ func (db *Database) setValuesFromConfig() {
 	dbName := os.Getenv("DB_NAME")
 
 	if dbHost == "" || dbPort == "" || dbUser == "" || dbName == "" {
-		logger.Log.Debug(`Make sure all these environment variables are set. 
+		logger.Log.Error(`Make sure all these environment variables are set. 
 		1. DB_HOST
 		2. DB_PORT
 		3. DB_USER
@@ -93,8 +93,6 @@ func (db *Database) migrations() {
 
 // SetConstants - this method is exposed for the main package to setup
 func SetConstants() {
-	// Setting up Logger
-	// logger.log.SetupLogger()
 	// Read values from config
 	DbConfig.setValuesFromConfig()
 	// Run Migrations

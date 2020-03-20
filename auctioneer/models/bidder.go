@@ -12,7 +12,6 @@ import (
 func GetActiveRegisteredBidders(db *sql.DB) (map[string]string, error) {
 	biddersMap := make(map[string]string)
 	if db == nil {
-		fmt.Println("Coming inside")
 		db = constants.DbConfig.GetDatabaseConnection()
 	}
 
@@ -52,10 +51,9 @@ func RegisterBidder(db *sql.DB, bidderID string, host string) error {
 	}
 
 	insert, err := db.Query(
-		`INSERT INTO bidders (id, domain, online) VALUES ('$1', '$2', true) on duplicate key update domain = '$3', online = true;`,
+		"INSERT INTO bidders (id, domain, online) VALUES (?, ?, true) on duplicate key update domain = ?, online = true;",
 		bidderID, host, host,
 	)
-
 	// if there is an error inserting, handle it
 	if err != nil {
 		logger.Log.Errorf(`Failed to insert bidder id in the database %v`, err)

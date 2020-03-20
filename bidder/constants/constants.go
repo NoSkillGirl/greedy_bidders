@@ -5,6 +5,7 @@ import (
 	"os"
 	"strconv"
 
+	logger "github.com/NoSkillGirl/greedy_bidders/log"
 	"github.com/google/uuid"
 )
 
@@ -22,7 +23,7 @@ func setBidderID() {
 
 	id, err := uuid.NewUUID()
 	if err != nil {
-		fmt.Println("UUID Generation Error")
+		logger.Log.Error("UUID Generation Error")
 	}
 	BidderID = id.String()
 
@@ -45,7 +46,7 @@ func (c *Conf) setValuesFromConfig() {
 	bidderDelay := os.Getenv("DELAY")
 
 	if auctioneerURL == "" || appHost == "" || appPort == "" || bidderDelay == "" {
-		fmt.Println(`Make sure all these environment variables are set. 
+		logger.Log.Error(`Make sure all these environment variables are set. 
 		1. AUCTIONEER_URL
 		2. PORT
 		3. DELAY
@@ -53,7 +54,7 @@ func (c *Conf) setValuesFromConfig() {
 
 		`)
 
-		fmt.Println("Example: AUCTIONEER_URL=localhost:8081 HOST=localhost PORT=8080 DELAY=150 go run main.go")
+		logger.Log.Error("Example: AUCTIONEER_URL=localhost:8081 HOST=localhost PORT=8080 DELAY=150 go run main.go")
 		// os.Exit(1)
 		panic("ENV not set")
 	}

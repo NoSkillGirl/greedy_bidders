@@ -4,7 +4,7 @@ import (
 	"database/sql"
 
 	"github.com/NoSkillGirl/greedy_bidders/auctioneer/constants"
-	logger "github.com/NoSkillGirl/greedy_bidders/auctioneer/log"
+	logger "github.com/NoSkillGirl/greedy_bidders/log"
 )
 
 // DeclareWinner - stores in the database about the auction winner and the price
@@ -14,7 +14,7 @@ func DeclareWinner(db *sql.DB, auctionID string, bidderID string, price float64)
 	}
 
 	insert, err := db.Query(
-		`insert into auctions (id, winner_bidder_id, price) VALUES ('$1', '$2', $3)`,
+		`insert into auctions (id, winner_bidder_id, price) VALUES (?, ?, ?)`,
 		auctionID, bidderID, price,
 	)
 

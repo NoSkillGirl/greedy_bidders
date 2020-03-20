@@ -9,8 +9,8 @@ import (
 	"sync"
 	"time"
 
-	logger "github.com/NoSkillGirl/greedy_bidders/auctioneer/log"
 	"github.com/NoSkillGirl/greedy_bidders/auctioneer/models"
+	logger "github.com/NoSkillGirl/greedy_bidders/log"
 )
 
 type NewBiddingRoundRequest struct {
@@ -35,7 +35,7 @@ func NewBiddingRound(w http.ResponseWriter, r *http.Request) {
 	// Req Decode
 	err := json.NewDecoder(r.Body).Decode(&reqJSON)
 	if err != nil {
-		fmt.Println(err)
+		logger.Log.Error(err)
 		json.NewEncoder(w).Encode(resp)
 		return
 	}

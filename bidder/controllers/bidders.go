@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
 	"math/rand"
 	"net/http"
 	"time"
@@ -10,6 +9,7 @@ import (
 	_ "net/http/pprof"
 
 	"github.com/NoSkillGirl/greedy_bidders/bidder/constants"
+	logger "github.com/NoSkillGirl/greedy_bidders/log"
 )
 
 type PlaceBidRequest struct {
@@ -34,7 +34,7 @@ func PlaceBid(w http.ResponseWriter, r *http.Request) {
 	// Req Decode
 	err := json.NewDecoder(r.Body).Decode(&reqJSON)
 	if err != nil {
-		fmt.Println(err)
+		logger.Log.Error(err)
 		json.NewEncoder(w).Encode(resp)
 		return
 	}
@@ -43,7 +43,7 @@ func PlaceBid(w http.ResponseWriter, r *http.Request) {
 
 	// validations
 	if reqJSON.AuctionID == "" {
-		fmt.Println("Auction ID is not present in the req")
+		logger.Log.Error("Auction ID is not present in the req")
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(resp)
 		return
